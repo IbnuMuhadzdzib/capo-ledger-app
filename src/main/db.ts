@@ -11,6 +11,9 @@ export interface IncomeRow {
   source: string
   note: string
   createdAt: string
+  isSplit?: boolean
+  grossAmount?: number | null
+  teamSize?: number | null
 }
 
 export interface IncomeInput {
@@ -19,6 +22,9 @@ export interface IncomeInput {
   amount: number
   source: string
   note: string
+  isSplit?: boolean
+  grossAmount?: number | null
+  teamSize?: number | null
 }
 
 export interface AllocationRow {
@@ -55,6 +61,18 @@ try {
   console.error('Migration check failed', e)
 }
 
+// Migration: Add new columns to incomes table if they don't exist
+try {
+  const tableInfo = db.prepare('PRAGMA table_info(incomes)').all() as any[];
+  if (!tableInfo.some(col => col.name === 'is_split')) {
+    db.exec('ALTER TABLE incomes ADD COLUMN is_split BOOLEAN DEFAULT 0;');
+    db.exec('ALTER TABLE incomes ADD COLUMN gross_amount REAL DEFAULT NULL;');
+    db.exec('ALTER TABLE incomes ADD COLUMN team_size INTEGER DEFAULT NULL;');
+  }
+} catch (e) {
+  console.error('Migration incomes columns failed', e)
+}
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS incomes (
     id TEXT PRIMARY KEY,
@@ -63,7 +81,10 @@ db.exec(`
     amount REAL NOT NULL,
     source TEXT DEFAULT '',
     note TEXT DEFAULT '',
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    is_split BOOLEAN DEFAULT 0,
+    gross_amount REAL DEFAULT NULL,
+    team_size INTEGER DEFAULT NULL
   );
 
   CREATE TABLE IF NOT EXISTS allocations (
@@ -87,7 +108,10 @@ function mapIncomeRow(row: any): IncomeRow {
     amount: row.amount,
     source: row.source ?? '',
     note: row.note ?? '',
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    isSplit: Boolean(row.is_split),
+    grossAmount: row.gross_amount ?? null,
+    teamSize: row.team_size ?? null
   }
 }
 
@@ -111,6 +135,15 @@ export function getIncomesByPeriod(month: number, year: number): IncomeRow[] {
     )
     .all(month, year) as any[]
   return rows.map(mapIncomeRow)
+}
+
+export function getGrossProjectsByPeriod(month: number, year: number): number {
+  const row = db
+    .prepare(
+      'SELECT COALESCE(SUM(gross_amount), 0) as total FROM incomes WHERE period_month = ? AND period_year = ? AND is_split = 1'
+    )
+    .get(month, year) as { total: number }
+  return row.total
 }
 
 export function getTotalByPeriod(month: number, year: number): number {
@@ -169,8 +202,8 @@ export function addIncome(input: IncomeInput): IncomeRow {
   const createdAt = new Date().toISOString()
 
   db.prepare(
-    `INSERT INTO incomes (id, period_month, period_year, amount, source, note, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO incomes (id, period_month, period_year, amount, source, note, created_at, is_split, gross_amount, team_size)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.periodMonth,
@@ -178,7 +211,10 @@ export function addIncome(input: IncomeInput): IncomeRow {
     input.amount,
     input.source,
     input.note,
-    createdAt
+    createdAt,
+    input.isSplit ? 1 : 0,
+    input.grossAmount ?? null,
+    input.teamSize ?? null
   )
 
   return mapIncomeRow({
@@ -188,15 +224,18 @@ export function addIncome(input: IncomeInput): IncomeRow {
     amount: input.amount,
     source: input.source,
     note: input.note,
-    created_at: createdAt
+    created_at: createdAt,
+    is_split: input.isSplit ? 1 : 0,
+    gross_amount: input.grossAmount ?? null,
+    team_size: input.teamSize ?? null
   })
 }
 
 export function updateIncome(id: string, input: IncomeInput): IncomeRow {
   db.prepare(
-    `UPDATE incomes SET period_month = ?, period_year = ?, amount = ?, source = ?, note = ?
+    `UPDATE incomes SET period_month = ?, period_year = ?, amount = ?, source = ?, note = ?, is_split = ?, gross_amount = ?, team_size = ?
      WHERE id = ?`
-  ).run(input.periodMonth, input.periodYear, input.amount, input.source, input.note, id)
+  ).run(input.periodMonth, input.periodYear, input.amount, input.source, input.note, input.isSplit ? 1 : 0, input.grossAmount ?? null, input.teamSize ?? null, id)
 
   const row = db.prepare('SELECT * FROM incomes WHERE id = ?').get(id) as any
   return mapIncomeRow(row)

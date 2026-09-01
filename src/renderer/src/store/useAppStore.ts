@@ -6,7 +6,9 @@ interface AppStore {
   editingIncome: IncomeRecord | null
   editingAllocation: AllocationRecord | null
   activeTab: 'daftar' | 'alokasi'
+  isSplitActive: boolean
   setActiveTab: (tab: 'daftar' | 'alokasi') => void
+  setIsSplitActive: (value: boolean) => void
   openForm: (type: 'income' | 'allocation', data?: IncomeRecord | AllocationRecord) => void
   closeForm: (type: 'income' | 'allocation') => void
 }
@@ -16,7 +18,9 @@ export const useAppStore = create<AppStore>()((set) => ({
   editingIncome: null,
   editingAllocation: null,
   activeTab: 'daftar',
+  isSplitActive: false,
   setActiveTab: (tab) => set({ activeTab: tab }),
+  setIsSplitActive: (value) => set({ isSplitActive: value }),
   openForm: (type, data) => set((state) => {
     const newForms = state.openForms.includes(type) 
       ? state.openForms 

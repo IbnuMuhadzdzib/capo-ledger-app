@@ -8,6 +8,9 @@ interface IncomeInput {
   amount: number
   source: string
   note: string
+  isSplit?: boolean
+  grossAmount?: number | null
+  teamSize?: number | null
 }
 
 interface AllocationInput {
@@ -20,6 +23,8 @@ interface AllocationInput {
 const api = {
   getIncomesByPeriod: (month: number, year: number) =>
     ipcRenderer.invoke('incomes:getByPeriod', month, year),
+  getGrossProjectsByPeriod: (month: number, year: number) =>
+    ipcRenderer.invoke('incomes:getGrossProjectsByPeriod', month, year),
   getTotalByPeriod: (month: number, year: number) =>
     ipcRenderer.invoke('incomes:getTotalByPeriod', month, year),
   getTotalAll: () => ipcRenderer.invoke('incomes:getTotalAll'),

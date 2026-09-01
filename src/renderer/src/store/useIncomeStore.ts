@@ -9,6 +9,7 @@ interface IncomeStore {
   incomes: IncomeRecord[]
   totalPeriod: number
   totalAll: number
+  grossProjectsByPeriod: number
   isLoading: boolean
   error: string | null
   updateTrigger: number
@@ -30,6 +31,7 @@ export const useIncomeStore = create<IncomeStore>()((set, get) => ({
   incomes: [],
   totalPeriod: 0,
   totalAll: 0,
+  grossProjectsByPeriod: 0,
   isLoading: false,
   error: null,
   updateTrigger: 0,
@@ -57,12 +59,13 @@ export const useIncomeStore = create<IncomeStore>()((set, get) => ({
     const { periodMonth, periodYear } = get()
     set({ isLoading: true, error: null })
     try {
-      const [incomes, totalPeriod, totalAll] = await Promise.all([
+      const [incomes, totalPeriod, totalAll, grossProjectsByPeriod] = await Promise.all([
         window.api.getIncomesByPeriod(periodMonth, periodYear),
         window.api.getTotalByPeriod(periodMonth, periodYear),
-        window.api.getTotalAll()
+        window.api.getTotalAll(),
+        window.api.getGrossProjectsByPeriod(periodMonth, periodYear)
       ])
-      set({ incomes, totalPeriod, totalAll, isLoading: false })
+      set({ incomes, totalPeriod, totalAll, grossProjectsByPeriod, isLoading: false })
       
       // Also refresh allocations for the new period
       await useAllocationStore.getState().refresh()

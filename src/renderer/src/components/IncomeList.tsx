@@ -58,6 +58,17 @@ export default function IncomeList({ incomes, onEdit, onDelete }: IncomeListProp
               <div style={{ fontWeight: 600, color: 'var(--noir-parchment)', fontFamily: 'var(--font-body)', fontSize: '13px' }}>
                 {income.source || 'Tanpa sumber'}
               </div>
+              {income.isSplit && (
+                <div style={{ marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '9px', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 6px', borderRadius: '3px', border: '1px solid rgba(56, 189, 248, 0.2)', fontWeight: 'bold' }}>SPLIT</span>
+                  {income.grossAmount && (
+                    <span style={{ fontSize: '10px', color: 'var(--noir-muted)' }}>of {formatRupiah(income.grossAmount)}</span>
+                  )}
+                  {income.teamSize && income.grossAmount && (
+                    <span style={{ fontSize: '10px', color: 'var(--noir-muted)' }}>({income.teamSize} members · {((income.amount / income.grossAmount) * 100).toFixed(0)}%)</span>
+                  )}
+                </div>
+              )}
               {income.note && (
                 <div style={{ fontSize: '11px', color: 'var(--noir-muted)', fontStyle: 'italic', marginTop: '2px' }}>{income.note}</div>
               )}
@@ -137,6 +148,16 @@ export default function IncomeList({ incomes, onEdit, onDelete }: IncomeListProp
               <div>
                 <div style={{ fontSize: '9px', fontFamily: 'var(--font-display)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--noir-muted)', marginBottom: '3px' }}>Note</div>
                 <div style={{ color: 'var(--noir-muted)', fontFamily: 'var(--font-body)', fontSize: '13px', fontStyle: 'italic' }}>{selectedIncome.note}</div>
+              </div>
+            )}
+            {selectedIncome.isSplit && (
+              <div>
+                <div style={{ fontSize: '9px', fontFamily: 'var(--font-display)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--noir-muted)', marginBottom: '3px' }}>Team Project</div>
+                <div style={{ color: 'var(--noir-parchment)', fontFamily: 'var(--font-body)', fontSize: '13px' }}>
+                  Gross: {selectedIncome.grossAmount ? formatRupiah(selectedIncome.grossAmount) : '-'} <br />
+                  Size: {selectedIncome.teamSize || '-'} members <br />
+                  Share: {selectedIncome.grossAmount ? ((selectedIncome.amount / selectedIncome.grossAmount) * 100).toFixed(1) + '%' : '-'}
+                </div>
               </div>
             )}
             <div>

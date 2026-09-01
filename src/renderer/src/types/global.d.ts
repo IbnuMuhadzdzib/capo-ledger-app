@@ -33,6 +33,7 @@ declare global {
     api: {
       // Incomes
       getIncomesByPeriod: (month: number, year: number) => Promise<IncomeRecord[]>
+      getGrossProjectsByPeriod: (month: number, year: number) => Promise<number>
       getTotalByPeriod: (month: number, year: number) => Promise<number>
       getTotalAll: () => Promise<number>
       getYearlySummary: (year: number) => Promise<MonthSummary[]>

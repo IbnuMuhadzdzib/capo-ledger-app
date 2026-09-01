@@ -27,6 +27,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "better-sqlite3": "^12.11.1",
     "framer-motion": "^12.42.0",
+    "lucide-react": "^1.38.0",
     "react-pageflip": "^2.0.3",
     "zustand": "^5.0.14"
   },

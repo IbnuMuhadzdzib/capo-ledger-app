@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import {
   getIncomesByPeriod,
+  getGrossProjectsByPeriod,
   getTotalByPeriod,
   getTotalAll,
   getYearlySummary,
@@ -22,6 +23,10 @@ import {
 export function registerIpcHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle('incomes:getByPeriod', (_e, month: number, year: number) =>
     getIncomesByPeriod(month, year)
+  )
+
+  ipcMain.handle('incomes:getGrossProjectsByPeriod', (_e, month: number, year: number) =>
+    getGrossProjectsByPeriod(month, year)
   )
 
   ipcMain.handle('incomes:getTotalByPeriod', (_e, month: number, year: number) =>

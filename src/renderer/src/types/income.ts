@@ -16,6 +16,9 @@ export interface IncomeInput {
   amount: number
   source: string
   note: string
+  isSplit?: boolean
+  grossAmount?: number | null
+  teamSize?: number | null
 }
 
 export interface IncomeRecord extends IncomeInput {
