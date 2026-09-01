@@ -25,6 +25,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@supabase/supabase-js": "^2.112.4",
     "better-sqlite3": "^12.11.1",
     "framer-motion": "^12.42.0",
     "lucide-react": "^1.38.0",

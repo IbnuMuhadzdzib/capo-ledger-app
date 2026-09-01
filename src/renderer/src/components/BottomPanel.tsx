@@ -6,13 +6,14 @@ import YearlyChart from './YearlyChart'
 import MostWanted from './MostWanted'
 import Associates from './Associates'
 import StakeoutCalendar from './StakeoutCalendar'
+import { getYearlySummary } from '../lib/chartQueries'
 
 // Tab definition — extensible for future tabs
 const TABS = [
-  { id: 'annual',     label: 'ANNUAL LEDGER', icon: '✦' },
-  { id: 'stakeout',  label: 'STAKEOUT',       icon: '👁' },
-  { id: 'wanted',    label: 'MOST WANTED',    icon: '☠' },
-  { id: 'associates',label: 'ASSOCIATES',     icon: '💼' }
+  { id: 'annual', label: 'ANNUAL LEDGER', icon: '✦' },
+  { id: 'stakeout', label: 'STAKEOUT', icon: '👁' },
+  { id: 'wanted', label: 'MOST WANTED', icon: '☠' },
+  { id: 'associates', label: 'ASSOCIATES', icon: '💼' }
 ]
 
 export default function BottomPanel() {
@@ -33,7 +34,7 @@ export default function BottomPanel() {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    window.api.getYearlySummary(chartYear).then((result) => {
+    getYearlySummary(chartYear).then((result) => {
       if (!cancelled) {
         setData(result)
         setLoading(false)
@@ -104,7 +105,7 @@ export default function BottomPanel() {
               <div className="bottom-stat-block">
                 <div className="bottom-stat-label">Peak Month</div>
                 <div className="bottom-stat-value" style={{ color: 'var(--noir-gold)' }}>
-                  {loading || peakIncome === 0 ? '—' : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][peakMonth]}
+                  {loading || peakIncome === 0 ? '—' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][peakMonth]}
                 </div>
                 {!loading && peakIncome > 0 && (
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--noir-muted)', marginTop: '2px' }}>

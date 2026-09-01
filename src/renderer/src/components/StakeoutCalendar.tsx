@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
 import type { DailyActivity } from '../types/global'
 import { useIncomeStore } from '../store/useIncomeStore'
 import { useAllocationStore } from '../store/useAllocationStore'
+import { getDailyActivity } from '../lib/chartQueries'
 
 interface StakeoutCalendarProps {
   year: number
@@ -9,13 +10,13 @@ interface StakeoutCalendarProps {
 }
 
 const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Fixed vertical sizing
-const CELL_H  = 13
-const GAP_V   = 3
-const STEP_V  = CELL_H + GAP_V  // 16 — total row height
-const GRID_H  = 7 * STEP_V      // 112px
+const CELL_H = 13
+const GAP_V = 3
+const STEP_V = CELL_H + GAP_V  // 16 — total row height
+const GRID_H = 7 * STEP_V      // 112px
 const DAY_LBL = 26              // px reserved for day-of-week labels
 
 const fmtCurrency = (n: number) =>
@@ -26,26 +27,26 @@ const fmtDay = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 function formatDayStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function getCellColor(count: number): string {
   if (count === 0) return 'rgba(201,161,59,0.06)'
   if (count === 1) return 'rgba(201,161,59,0.28)'
-  if (count <= 3)  return 'rgba(201,161,59,0.55)'
-  if (count <= 6)  return 'rgba(201,161,59,0.78)'
+  if (count <= 3) return 'rgba(201,161,59,0.55)'
+  if (count <= 6) return 'rgba(201,161,59,0.78)'
   return 'rgba(201,161,59,1.00)'
 }
 
 export default function StakeoutCalendar({ year, onDrillDown }: StakeoutCalendarProps) {
-  const [rawData,   setRawData]   = useState<DailyActivity[]>([])
-  const [tooltip,   setTooltip]   = useState<{ text: string; x: number; y: number } | null>(null)
-  const [availW,    setAvailW]    = useState(900)
+  const [rawData, setRawData] = useState<DailyActivity[]>([])
+  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null)
+  const [availW, setAvailW] = useState(900)
   const containerRef = useRef<HTMLDivElement>(null)
-  const gridAreaRef  = useRef<HTMLDivElement>(null)
+  const gridAreaRef = useRef<HTMLDivElement>(null)
 
   const incomeUpd = useIncomeStore((s) => s.updateTrigger)
-  const allocUpd  = useAllocationStore((s) => s.updateTrigger)
+  const allocUpd = useAllocationStore((s) => s.updateTrigger)
 
   // Measure grid area width dynamically
   useLayoutEffect(() => {
@@ -60,7 +61,7 @@ export default function StakeoutCalendar({ year, onDrillDown }: StakeoutCalendar
 
   useEffect(() => {
     let cancelled = false
-    window.api.getDailyActivity(year).then((data: DailyActivity[]) => {
+    getDailyActivity(year).then((data: DailyActivity[]) => {
       if (!cancelled) setRawData(data)
     })
     return () => { cancelled = true }
@@ -114,8 +115,8 @@ export default function StakeoutCalendar({ year, onDrillDown }: StakeoutCalendar
   }, [rawData, countMap, year])
 
   // Build grid
-  const startDate   = new Date(year, 0, 1)
-  const endDate     = new Date(year, 11, 31)
+  const startDate = new Date(year, 0, 1)
+  const endDate = new Date(year, 11, 31)
   const startOffset = startDate.getDay()
   const allDays: (Date | null)[] = Array(startOffset).fill(null)
   const cur2 = new Date(startDate)
@@ -126,8 +127,8 @@ export default function StakeoutCalendar({ year, onDrillDown }: StakeoutCalendar
 
   const numWeeks = weeks.length
   const cellAreaW = availW - DAY_LBL
-  const STEP_H    = cellAreaW / numWeeks              // dynamic horizontal step
-  const CELL_W    = Math.max(STEP_H - 2, 3)          // cell width = step minus 2px gap
+  const STEP_H = cellAreaW / numWeeks              // dynamic horizontal step
+  const CELL_W = Math.max(STEP_H - 2, 3)          // cell width = step minus 2px gap
 
   const monthCols: { label: string; col: number }[] = []
   weeks.forEach((week, wi) => {
@@ -198,9 +199,9 @@ export default function StakeoutCalendar({ year, onDrillDown }: StakeoutCalendar
               week.map((d, di) => {
                 if (!d) return null
                 const ds = formatDayStr(d)
-                const count  = countMap.get(ds) ?? 0
+                const count = countMap.get(ds) ?? 0
                 const amount = totalMap.get(ds) ?? 0
-                const isToday  = today.toDateString() === d.toDateString()
+                const isToday = today.toDateString() === d.toDateString()
                 const isFuture = d > today && d.getFullYear() === today.getFullYear()
                 const cx = wi * STEP_H
                 const cy = di * STEP_V

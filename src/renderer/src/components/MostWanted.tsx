@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { MostWantedCategory } from '../types/global'
 import { useAllocationStore } from '../store/useAllocationStore'
 import { motion } from 'framer-motion'
+import { getMostWantedAllocations } from '../lib/chartQueries'
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
@@ -19,7 +20,7 @@ export default function MostWanted({ year }: MostWantedProps) {
     let cancelled = false
     setLoading(true)
 
-    window.api.getMostWantedAllocations(year).then((res) => {
+    getMostWantedAllocations(year).then((res) => {
       if (!cancelled) {
         setData(res)
         setLoading(false)
@@ -54,49 +55,50 @@ export default function MostWanted({ year }: MostWantedProps) {
           {data.map((item, index) => {
             const phrase = CRIME_PHRASES[index % CRIME_PHRASES.length]
             const crimeText = phrase.split('{label}')
-            
+
             return (
-            <motion.div 
-              key={item.label}
-              className="wanted-poster"
-              initial={{ opacity: 0, y: 10, rotate: (Math.random() - 0.5) * 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
-            >
-              <div className="poster-header">
-                <div className="rank-badge">#{index + 1}</div>
-                <h2>WANTED</h2>
-                <div className="poster-stars">★★★</div>
-              </div>
-              
-              <div className="poster-body">
-                <div className="suspect-photo-placeholder">
-                  {/* Silhouette icon */}
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
+              <motion.div
+                key={item.label}
+                className="wanted-poster"
+                initial={{ opacity: 0, y: 10, rotate: (Math.random() - 0.5) * 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
+              >
+                <div className="poster-header">
+                  <div className="rank-badge">#{index + 1}</div>
+                  <h2>WANTED</h2>
+                  <div className="poster-stars">★★★</div>
                 </div>
-                <div className="suspect-name" title={item.label}>
-                  {item.label}
-                </div>
-              </div>
 
-              <div className="poster-footer">
-                <div className="bounty-label">BOUNTY</div>
-                <div className="bounty-amount">{fmt(item.total)}</div>
-              </div>
-
-              {/* Hover Overlay */}
-              <div className="poster-overlay">
-                <div className="overlay-title">CRIME</div>
-                <div className="overlay-desc">
-                  {crimeText[0]}<strong>{item.label}</strong>{crimeText[1]}
+                <div className="poster-body">
+                  <div className="suspect-photo-placeholder">
+                    {/* Silhouette icon */}
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </div>
+                  <div className="suspect-name" title={item.label}>
+                    {item.label}
+                  </div>
                 </div>
-                <div className="overlay-stamp">GUILTY</div>
-              </div>
-            </motion.div>
-          )})}
+
+                <div className="poster-footer">
+                  <div className="bounty-label">BOUNTY</div>
+                  <div className="bounty-amount">{fmt(item.total)}</div>
+                </div>
+
+                {/* Hover Overlay */}
+                <div className="poster-overlay">
+                  <div className="overlay-title">CRIME</div>
+                  <div className="overlay-desc">
+                    {crimeText[0]}<strong>{item.label}</strong>{crimeText[1]}
+                  </div>
+                  <div className="overlay-stamp">GUILTY</div>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       )}
     </div>
