@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import AppShell from './components/AppShell'
 import PassbookPanel from './components/PassbookPanel'
@@ -13,35 +13,60 @@ import ActivityLog from './components/ActivityLog'
 
 // Total side panel height
 const PANEL_H = 570
-// Gap between slots
 const GAP = 12
-// Activity log compact height when a form is also visible
-const LOG_COMPACT = 240
-// Form height in normal mode (fills the remaining space)
-const FORM_NORMAL_H = PANEL_H - LOG_COMPACT - GAP // 318px
+
+// Calculates the exact pixel height for a slot so the container never overflows.
+function getSlotHeight(slot: string, currentSlots: string[]): number {
+  if (currentSlots.length === 1) return PANEL_H;
+
+  // 2 slots total = 558px (570 - 12 gap)
+  // Form(s) are always at the top, activity-log always at the bottom.
+  if (slot === 'activity-log') return 240;
+  if (slot === 'income') return 318;
+  if (slot === 'allocation') {
+    // if stacked with income (no activity-log), split evenly
+    if (currentSlots.includes('income')) return 279;
+    return 318;
+  }
+
+  return 279;
+}
 
 export default function App() {
   const refresh = useIncomeStore((s) => s.refresh)
   const { openForms, isSplitActive } = useAppStore()
 
   const [slots, setSlots] = useState<string[]>(['activity-log'])
+  // Track previous form count to distinguish direction of transition
+  const prevOpenFormsLenRef = useRef(0)
 
   useEffect(() => {
     refresh()
   }, [refresh])
 
   useEffect(() => {
+    const prevLen = prevOpenFormsLenRef.current
+
     if (openForms.length === 0) {
+      // All forms closed: only activity log
       setSlots(['activity-log'])
     } else if (isSplitActive) {
-      // Split ON: form takes full 570px, activity log hidden
-      const latestForm = openForms[openForms.length - 1]
-      setSlots([latestForm])
+      // Split income expands to full height
+      setSlots(['income'])
+    } else if (openForms.length === 1) {
+      if (prevLen >= 2) {
+        // Coming FROM 2 forms (cancelled one): remaining form stays TOP, activity-log enters from BELOW
+        setSlots([openForms[0], 'activity-log'])
+      } else {
+        // Opening first form (0→1): activity-log stays TOP, form enters from BELOW
+        setSlots(['activity-log', openForms[0]])
+      }
     } else {
-      // Split OFF: compact activity log + form below
-      const latestForm = openForms[openForms.length - 1]
-      setSlots(['activity-log', latestForm])
+      // 2 forms: activity-log exits, first form TOP, second form enters from BELOW
+      setSlots([openForms[0], openForms[1]])
     }
+
+    prevOpenFormsLenRef.current = openForms.length
   }, [openForms, isSplitActive])
 
   return (
@@ -54,13 +79,11 @@ export default function App() {
           <AnimatePresence initial={false}>
             {slots.map((slot) => {
               if (slot === 'activity-log') {
-                const hasForm = slots.some(s => s !== 'activity-log')
-                const logH = hasForm ? LOG_COMPACT : PANEL_H
                 return (
                   <motion.div
                     key="activity-log"
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: logH }}
+                    animate={{ opacity: 1, height: getSlotHeight(slot, slots) }}
                     exit={{ opacity: 0, height: 0, transition: { duration: 0.18 } }}
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                     style={{
@@ -73,18 +96,16 @@ export default function App() {
                       overflow: 'hidden'
                     }}
                   >
-                    <ActivityLog isCompact={hasForm} />
+                    <ActivityLog isCompact={slots.length > 1} />
                   </motion.div>
                 )
               }
 
-              // Form slot — height depends on split mode
-              const formH = isSplitActive ? PANEL_H : FORM_NORMAL_H
               return (
                 <motion.div
                   key={`form-${slot}`}
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: formH }}
+                  animate={{ opacity: 1, height: getSlotHeight(slot, slots) }}
                   exit={{ opacity: 0, height: 0, transition: { duration: 0.18 } }}
                   transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   style={{ width: '100%', flexShrink: 0, overflow: 'hidden' }}
