@@ -12,6 +12,7 @@ interface IncomeStore {
   totalPeriod: number
   totalAll: number
   grossProjectsByPeriod: number
+  grossAllTime: number
   isLoading: boolean
   error: string | null
   updateTrigger: number
@@ -34,6 +35,7 @@ export const useIncomeStore = create<IncomeStore>()((set, get) => ({
   totalPeriod: 0,
   totalAll: 0,
   grossProjectsByPeriod: 0,
+  grossAllTime: 0,
   isLoading: false,
   error: null,
   updateTrigger: 0,
@@ -79,10 +81,10 @@ export const useIncomeStore = create<IncomeStore>()((set, get) => ({
 
       if (periodError) throw new Error(periodError.message)
 
-      // 2. Fetch all incomes just to get the totalAll (using amount only for efficiency)
+      // 2. Fetch all incomes (for totalAll + grossAllTime)
       const { data: allIncomes, error: allError } = await supabase
         .from('incomes')
-        .select('amount')
+        .select('amount, gross_amount, is_split')
         .eq('user_id', user.id)
 
       if (allError) throw new Error(allError.message)
@@ -102,13 +104,16 @@ export const useIncomeStore = create<IncomeStore>()((set, get) => ({
       })) as IncomeRecord[]
 
       const totalPeriod = incomes.reduce((sum, item) => sum + item.amount, 0)
-      const totalAll = (allIncomes || []).reduce((sum, item) => sum + item.amount, 0)
+      const totalAll = (allIncomes || []).reduce((sum: number, item: any) => sum + item.amount, 0)
+      const grossAllTime = (allIncomes || []).reduce((sum: number, item: any) => {
+        return sum + (item.is_split ? (item.gross_amount || 0) : 0)
+      }, 0)
       
       const grossProjectsByPeriod = incomes.reduce((sum, item) => {
         return sum + (item.isSplit ? (item.grossAmount || 0) : 0)
       }, 0)
 
-      set({ incomes, totalPeriod, totalAll, grossProjectsByPeriod, isLoading: false })
+      set({ incomes, totalPeriod, totalAll, grossProjectsByPeriod, grossAllTime, isLoading: false })
       
       // Also refresh allocations for the new period
       await useAllocationStore.getState().refresh()

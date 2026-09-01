@@ -14,6 +14,7 @@ export default function PassbookPanel() {
     totalPeriod,
     totalAll,
     grossProjectsByPeriod,
+    grossAllTime,
     goToPreviousPeriod,
     goToNextPeriod
   } = useIncomeStore()
@@ -107,7 +108,7 @@ export default function PassbookPanel() {
         {/* ── Summary Card ──────────────────────────────── */}
         <div className="passbook-card">
           <span className="passbook-card-label">Summary</span>
-          <SummaryRibbon totalPeriod={totalPeriod} totalAll={totalAll} grossProjectsByPeriod={grossProjectsByPeriod} />
+          <SummaryRibbon totalPeriod={totalPeriod} totalAll={totalAll} grossProjectsByPeriod={grossProjectsByPeriod} grossAllTime={grossAllTime} />
         </div>
 
         {/* ── Tab + Action Button ───────────────────────── */}
