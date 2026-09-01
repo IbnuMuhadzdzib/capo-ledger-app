@@ -25,26 +25,28 @@
 }
 
 :root {
-  --noir-black:     #0c0c0c;
-  --noir-dark:      #141414;
-  --noir-panel:     #1a1a1a;
-  --noir-card:      #1f1f1f;
-  --noir-border:    #c9a13b;
-  --noir-border-dim:#5a4a22;
-  --noir-gold:      #c9a13b;
-  --noir-gold-dim:  #8a6d22;
+  --noir-black: #0c0c0c;
+  --noir-dark: #141414;
+  --noir-panel: #1a1a1a;
+  --noir-card: #1f1f1f;
+  --noir-border: #c9a13b;
+  --noir-border-dim: #5a4a22;
+  --noir-gold: #c9a13b;
+  --noir-gold-dim: #8a6d22;
   --noir-parchment: #e8dfc8;
-  --noir-muted:     #9a8a6a;
-  --noir-red:       #8b2020;
-  --noir-red-bright:#cc3333;
-  --noir-green:     #3d6b3d;
-  --noir-green-bright:#5aaa5a;
-  --font-display:   'Quincy', Georgia, serif;
-  --font-body:      'Special Elite', 'Courier Prime', monospace;
-  --font-mono:      'Courier Prime', monospace;
+  --noir-muted: #9a8a6a;
+  --noir-red: #8b2020;
+  --noir-red-bright: #cc3333;
+  --noir-green: #3d6b3d;
+  --noir-green-bright: #5aaa5a;
+  --font-display: 'Quincy', Georgia, serif;
+  --font-body: 'Special Elite', 'Courier Prime', monospace;
+  --font-mono: 'Courier Prime', monospace;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -132,7 +134,7 @@ html, body, #root {
   flex-direction: column;
   gap: 4px;
   min-width: 140px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
 }
 
 .settings-popover-label {
@@ -434,15 +436,16 @@ html, body, #root {
   color: #0c0c0c;
   border: none;
   border-radius: 4px;
-  padding: 9px 16px;
+  padding: 10px 20px;
   font-weight: 700;
   cursor: pointer;
   font-family: var(--font-display);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-size: 12px;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(201, 161, 59, 0.25);
+  flex: 1;
 }
 
 .btn-primary:hover {
@@ -451,21 +454,29 @@ html, body, #root {
   transform: translateY(-1px);
 }
 
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-secondary {
   background: transparent;
-  border: 1px solid var(--noir-border-dim);
-  color: var(--noir-parchment);
-  border-radius: 4px;
-  padding: 8px 14px;
+  border: none;
+  color: var(--noir-muted);
+  padding: 10px 12px;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 11px;
   cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 13px;
-  transition: all 0.15s;
+  transition: color 0.15s;
+  flex-shrink: 0;
 }
 
 .btn-secondary:hover {
-  border-color: var(--noir-gold);
-  color: var(--noir-gold);
+  color: var(--noir-parchment);
 }
 
 /* ═══ Form Inputs ═════════════════════════════════════ */
@@ -526,8 +537,15 @@ textarea.form-input {
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(-20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .side-module-card {
@@ -648,7 +666,7 @@ textarea.form-input {
   border-radius: 6px;
   padding: 14px;
   width: 260px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.9);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
 }
 
 .month-picker-header {
@@ -906,4 +924,3 @@ textarea.form-input {
   font-size: 6px;
   opacity: 0.6;
 }
-

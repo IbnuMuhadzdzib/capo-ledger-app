@@ -53,41 +53,45 @@ export default function AllocationForm() {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v).replace('Rp', 'Rp ')
 
   return (
-    <form className="side-module-card cursor-no-drag" onSubmit={handleSubmit}>
-      <h3 className="font-serif text-lg mb-4" style={{ borderBottom: '1px solid rgba(201,161,59,0.3)', paddingBottom: '10px', margin: '0 0 16px 0', fontFamily: 'var(--font-display)', color: 'var(--noir-gold)', letterSpacing: '0.06em' }}>
+    <form className="side-module-card cursor-no-drag" onSubmit={handleSubmit} style={{ gap: 0 }}>
+      <h3 className="font-serif text-lg mb-4" style={{ borderBottom: '1px solid rgba(201,161,59,0.3)', paddingBottom: '10px', margin: '0', fontFamily: 'var(--font-display)', color: 'var(--noir-gold)', letterSpacing: '0.06em', flexShrink: 0 }}>
         {isEdit ? 'Edit Allocation' : 'Add Allocation'}
       </h3>
 
-      <input
-        type="text"
-        placeholder="Label (e.g. Savings, Rent)"
-        className="form-input mb-3"
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        required
-      />
-
-      <div className="mb-3">
-        <CurrencyInput
-          value={amount}
-          onValueChange={setAmount}
-          placeholder="Amount"
+      {/* Content area — no scroll, fits within card */}
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
+        <input
+          type="text"
+          placeholder="Label (e.g. Savings, Rent)"
+          className="form-input"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
           required
         />
-        {amount > 0 && (
-          <div style={{ fontSize: '11px', color: finalRemaining < 0 ? 'rgba(220, 53, 69, 0.9)' : 'var(--noir-gold)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <svg
-              width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-              className={finalRemaining < 0 ? "animate-pulse" : ""}
-            >
-              <line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-            Balance after allocation: {finalRemaining < 0 ? '-' : ''}{fmtIDR(Math.abs(finalRemaining))}
-          </div>
-        )}
+
+        <div>
+          <CurrencyInput
+            value={amount}
+            onValueChange={setAmount}
+            placeholder="Amount"
+            required
+          />
+          {amount > 0 && (
+            <div style={{ fontSize: '11px', color: finalRemaining < 0 ? 'rgba(220, 53, 69, 0.9)' : 'var(--noir-gold)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <svg
+                width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                className={finalRemaining < 0 ? "animate-pulse" : ""}
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              Balance after allocation: {finalRemaining < 0 ? '-' : ''}{fmtIDR(Math.abs(finalRemaining))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex justify-end gap-2 mt-auto pt-4" style={{ borderTop: '1px solid rgba(201,161,59,0.2)' }}>
+      {/* Pinned footer — never overflows */}
+      <div style={{ flexShrink: 0, display: 'flex', gap: '8px', alignItems: 'stretch', paddingTop: '14px', borderTop: '1px solid rgba(201,161,59,0.2)' }}>
         <button type="button" className="btn-secondary" onClick={() => closeForm('allocation')}>
           Cancel
         </button>

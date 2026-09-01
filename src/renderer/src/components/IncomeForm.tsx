@@ -71,12 +71,13 @@ export default function IncomeForm() {
   }
 
   return (
-    <form className="side-module-card cursor-no-drag" onSubmit={handleSubmit}>
-      <h3 style={{ borderBottom: '1px solid rgba(201,161,59,0.3)', paddingBottom: '10px', margin: '0 0 16px 0', fontFamily: 'var(--font-display)', color: 'var(--noir-gold)', letterSpacing: '0.06em', fontSize: '15px' }}>
+    <form className="side-module-card cursor-no-drag" onSubmit={handleSubmit} style={{ gap: 0 }}>
+      <h3 style={{ borderBottom: '1px solid rgba(201,161,59,0.3)', paddingBottom: '10px', margin: '0 0 0 0', fontFamily: 'var(--font-display)', color: 'var(--noir-gold)', letterSpacing: '0.06em', fontSize: '15px', flexShrink: 0 }}>
         {isEdit ? 'Edit Income' : 'Add Income'}
       </h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 0 16px 0', gap: isSplit ? '16px' : '14px' }}>
+      {/* Content area — no scroll, fits within card */}
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: isSplit ? '10px' : '10px', padding: '12px 0' }}>
         <input
           type="text"
           placeholder="Source (e.g. Salary, Freelance)"
@@ -143,15 +144,16 @@ export default function IncomeForm() {
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
+
+        {isSplit && (
+          <div style={{ fontSize: '11px', color: 'var(--noir-muted)', textAlign: 'center' }}>
+            [Allocation] (dari share kamu aja)
+          </div>
+        )}
       </div>
 
-      {isSplit && (
-        <div style={{ fontSize: '11px', color: 'var(--noir-muted)', marginTop: 'auto', textAlign: 'center', marginBottom: '12px' }}>
-          [Allocation] (dari share kamu aja)
-        </div>
-      )}
-
-      <div className="flex justify-end gap-2 mt-auto pt-4" style={{ borderTop: '1px solid rgba(201,161,59,0.2)' }}>
+      {/* Pinned footer — never overflows */}
+      <div style={{ flexShrink: 0, display: 'flex', gap: '8px', alignItems: 'stretch', paddingTop: '14px', borderTop: '1px solid rgba(201,161,59,0.2)' }}>
         <button type="button" className="btn-secondary" onClick={handleCancel}>
           Cancel
         </button>
