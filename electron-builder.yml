@@ -13,7 +13,7 @@ asarUnpack:
   - resources/**
 win:
   executableName: capo-ledger
-  icon: build/icon.ico
+  icon: resources/icon.png
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -21,8 +21,6 @@ nsis:
   createDesktopShortcut: always
   oneClick: false
   allowToChangeInstallationDirectory: true
-  installerIcon: build/icon.ico
-  uninstallerIcon: build/icon.ico
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
