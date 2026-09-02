@@ -180,7 +180,7 @@ export default function LoginScreen() {
                                 </svg>
                                 AUTHENTICATING...
                             </>
-                        ) : 'ACCESS ARCHIVE'}
+                        ) : 'LOGIN TO ARCHIVE'}
                     </button>
                 </form>
             </div>
