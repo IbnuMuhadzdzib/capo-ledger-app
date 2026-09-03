@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useIncomeStore } from '../store/useIncomeStore'
 import { useTellerStore } from '../store/useTellerStore'
-import { useAuthStore } from '../store/useAuthStore'
 import { MONTH_NAMES } from '../constants'
 import SummaryRibbon from './SummaryRibbon'
 import SettingsMenu from './SettingsMenu'
@@ -53,16 +52,7 @@ export default function PassbookPanel() {
       >
         <span className="passbook-header-title">CAPO LEDGER</span>
         <div className="app-titlebar-actions">
-          <button
-            className="window-btn cursor-no-drag"
-            style={{ color: 'var(--noir-red-bright)', fontSize: '11px', letterSpacing: '0.1em', padding: '0 8px' }}
-            onClick={() => {
-              void useAuthStore.getState().signOut()
-            }}
-            title="Logout"
-          >
-            LOGOUT
-          </button>
+
           <SettingsMenu />
           <button
             className="window-btn cursor-no-drag"

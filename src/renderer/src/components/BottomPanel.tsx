@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useIncomeStore } from '../store/useIncomeStore'
 import { useAllocationStore } from '../store/useAllocationStore'
+import { useAuthStore } from '../store/useAuthStore'
 import type { MonthSummary } from '../types/global'
 import YearlyChart from './YearlyChart'
 import MostWanted from './MostWanted'
@@ -17,6 +18,7 @@ const TABS = [
 ]
 
 export default function BottomPanel() {
+  const user = useAuthStore((state) => state.user)
   const { periodYear } = useIncomeStore()
   const incomeUpdateTrigger = useIncomeStore((state) => state.updateTrigger)
   const allocationUpdateTrigger = useAllocationStore((state) => state.updateTrigger)
@@ -43,7 +45,7 @@ export default function BottomPanel() {
       if (!cancelled) setLoading(false)
     })
     return () => { cancelled = true }
-  }, [chartYear, incomeUpdateTrigger, allocationUpdateTrigger])
+  }, [chartYear, incomeUpdateTrigger, allocationUpdateTrigger, user])
 
   const totalYearIncome = data.reduce((s, d) => s + d.income, 0)
   const peakMonth = data.reduce((pi, d, i) => (d.income > data[pi].income ? i : pi), 0)

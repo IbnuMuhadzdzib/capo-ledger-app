@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain, BrowserWindow, screen } from 'electron'
 import {
   getIncomesByPeriod,
   getGrossProjectsByPeriod,
@@ -93,16 +93,15 @@ export function registerIpcHandlers(mainWindow: BrowserWindow): void {
   })
 
   ipcMain.handle('window:setSize', (_e, width: number, height: number) => {
-    const [currentWidth] = mainWindow.getSize()
-    const [x, y] = mainWindow.getPosition()
+    const display = screen.getDisplayMatching(mainWindow.getBounds())
+    const { x: dx, y: dy, width: dw, height: dh } = display.workArea
     
-    // Hitung posisi X baru agar sisi KANAN window tidak bergerak
-    const deltaWidth = width - currentWidth
-    const newX = x - deltaWidth
+    const newX = Math.round(dx + (dw - width) / 2)
+    const newY = Math.round(dy + (dh - height) / 2)
 
     // Gunakan setBounds agar perubahan posisi dan ukuran terjadi bersamaan
     // Matikan animasi (false) untuk menghindari flickering/blinking brutal di Windows
-    mainWindow.setBounds({ x: newX, y, width, height }, false)
+    mainWindow.setBounds({ x: newX, y: newY, width, height }, false)
     
     setSetting('windowWidth', String(width))
     setSetting('windowHeight', String(height))

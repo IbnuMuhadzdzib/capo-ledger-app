@@ -1,7 +1,7 @@
 {
   "name": "capo-ledger",
   "productName": "Capo Ledger",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Capo Ledger - Noir Financial Archive",
   "main": "./out/main/index.js",
   "author": "example.com",

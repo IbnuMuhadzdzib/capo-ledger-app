@@ -19,7 +19,9 @@ export const MONTH_NAMES_SHORT = [
 ]
 
 export const WINDOW_SIZE_PRESETS = [
+  { label: 'Mini', width: 600, height: 550 },
   { label: 'Compact', width: 750, height: 700 },
   { label: 'Normal', width: 850, height: 800 },
-  { label: 'Large', width: 1000, height: 950 }
+  { label: 'Large', width: 1000, height: 950 },
+  { label: 'Original', width: 1450, height: 870 }
 ]
