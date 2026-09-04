@@ -7,6 +7,8 @@ import IncomeForm from './components/IncomeForm'
 import AllocationForm from './components/AllocationForm'
 import { useIncomeStore } from './store/useIncomeStore'
 import { useAppStore } from './store/useAppStore'
+import { useAuthStore } from './store/useAuthStore'
+import { useTellerStore } from './store/useTellerStore'
 import RightModule from './components/RightModule'
 import BottomPanel from './components/BottomPanel'
 import ActivityLog from './components/ActivityLog'
@@ -43,6 +45,23 @@ export default function App() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  useEffect(() => {
+    // We safely attempt to listen only if the api exists
+    if (window.api && window.api.onTrayAction) {
+      window.api.onTrayAction(async (action) => {
+        if (action === 'logout') {
+          useAuthStore.getState().signOut()
+        } else if (action === 'addIncome') {
+          useAppStore.getState().openForm('income')
+          useTellerStore.getState().say('addIncome')
+        } else if (action === 'addAllocation') {
+          useAppStore.getState().openForm('allocation')
+          useTellerStore.getState().say('addIncome') // Using same voice line
+        }
+      })
+    }
+  }, [])
 
   useEffect(() => {
     const prevLen = prevOpenFormsLenRef.current

@@ -1,18 +1,11 @@
 import { useState } from 'react'
 import { WINDOW_SIZE_PRESETS } from '../constants'
-import { useAuthStore } from '../store/useAuthStore'
 
 export default function SettingsMenu() {
   const [open, setOpen] = useState(false)
-  const { signOut } = useAuthStore()
 
   const applyPreset = async (width: number, height: number) => {
     await window.api.setWindowSize(width, height)
-    setOpen(false)
-  }
-
-  const handleLogout = async () => {
-    await signOut()
     setOpen(false)
   }
 
@@ -37,16 +30,6 @@ export default function SettingsMenu() {
               {p.label} ({p.width}×{p.height})
             </button>
           ))}
-
-          <div style={{ height: '1px', background: 'var(--noir-border-dim)', margin: '6px 0', opacity: 0.5 }} />
-
-          <button
-            className="settings-preset-btn"
-            style={{ color: 'var(--noir-red-bright)', letterSpacing: '0.1em' }}
-            onClick={handleLogout}
-          >
-            SIGN OUT / LOCK
-          </button>
         </div>
       )}
     </div>

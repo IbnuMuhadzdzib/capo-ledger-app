@@ -56,6 +56,8 @@ declare global {
       setWindowSize: (width: number, height: number) => Promise<void>
       setIgnoreMouseEvents: (ignore: boolean) => void
       moveDelta: (dx: number, dy: number) => void
+      onTrayAction: (callback: (action: string) => void) => void
+      sendTrayAction: (action: string) => void
     }
   }
 }

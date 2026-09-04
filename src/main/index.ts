@@ -1,10 +1,57 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, screen } from 'electron'
+import { app, BrowserWindow, Tray, nativeImage, screen } from 'electron'
 import path from 'path'
 import { registerIpcHandlers } from './ipc'
 import { setSetting } from './db'
 
 let mainWindow: BrowserWindow | null = null
+let trayWindow: BrowserWindow | null = null
 let tray: Tray | null = null
+
+function getTrayWindowPosition(): { x: number; y: number } | undefined {
+  if (!tray || !trayWindow) return undefined
+  const trayBounds = tray.getBounds()
+  const windowBounds = trayWindow.getBounds()
+  
+  // Center horizontally relative to tray icon
+  const x = Math.round(trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2)
+  
+  // Position above the taskbar on Windows (bottom taskbar typical)
+  const y = Math.round(trayBounds.y - windowBounds.height - 10)
+  
+  return { x, y }
+}
+
+function createTrayWindow(): void {
+  trayWindow = new BrowserWindow({
+    width: 250,
+    height: 230, // Adjusted down to fit without extra padding
+    show: false,
+    frame: false,
+    fullscreenable: false,
+    resizable: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  })
+
+  trayWindow.on('blur', () => {
+    trayWindow?.hide()
+  })
+
+  // Support transparent background
+  trayWindow.setBackgroundColor('#00000000')
+
+  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+    trayWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/tray`)
+  } else {
+    trayWindow.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: '/tray' })
+  }
+}
 
 function createTray(): void {
   const iconPath = path.join(__dirname, '../../resources/icon.png')
@@ -12,29 +59,23 @@ function createTray(): void {
   tray = new Tray(icon)
   tray.setToolTip('Capo Ledger')
 
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Show Capo Ledger',
-      click: () => {
-        mainWindow?.show()
-        mainWindow?.focus()
+  createTrayWindow()
+
+  const toggleTrayWindow = () => {
+    if (trayWindow?.isVisible()) {
+      trayWindow.hide()
+    } else {
+      const position = getTrayWindowPosition()
+      if (position) {
+        trayWindow?.setPosition(position.x, position.y, false)
       }
-    },
-    { type: 'separator' },
-    {
-      label: 'Quit',
-      click: () => {
-        app.quit()
-      }
+      trayWindow?.show()
+      trayWindow?.focus()
     }
-  ])
+  }
 
-  tray.setContextMenu(contextMenu)
-
-  tray.on('double-click', () => {
-    mainWindow?.show()
-    mainWindow?.focus()
-  })
+  tray.on('click', toggleTrayWindow)
+  tray.on('right-click', toggleTrayWindow)
 }
 
 function createWindow(): void {

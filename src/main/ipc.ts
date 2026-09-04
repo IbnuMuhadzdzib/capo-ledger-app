@@ -106,4 +106,21 @@ export function registerIpcHandlers(mainWindow: BrowserWindow): void {
     setSetting('windowWidth', String(width))
     setSetting('windowHeight', String(height))
   })
+
+  ipcMain.on('tray:action', (_e, action: string) => {
+    if (action === 'show') {
+      mainWindow.show()
+      mainWindow.focus()
+    } else if (action === 'quit') {
+      // Because we hide tray on quit, we can just close the main window or call app.quit()
+      import('electron').then(({ app }) => {
+        app.quit()
+      })
+    } else {
+      // Forward the rest to window
+      mainWindow.show()
+      mainWindow.focus()
+      mainWindow.webContents.send('tray-action', action)
+    }
+  })
 }

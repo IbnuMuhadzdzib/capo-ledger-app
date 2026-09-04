@@ -6,6 +6,7 @@ import SummaryRibbon from './SummaryRibbon'
 import SettingsMenu from './SettingsMenu'
 import MonthPicker from './MonthPicker'
 import { useAppStore } from '../store/useAppStore'
+import { useAuthStore } from '../store/useAuthStore' // newly added
 
 export default function PassbookPanel() {
   const {
@@ -52,6 +53,16 @@ export default function PassbookPanel() {
       >
         <span className="passbook-header-title">CAPO LEDGER</span>
         <div className="app-titlebar-actions">
+
+          <button
+            className="window-btn cursor-no-drag"
+            onClick={() => useAuthStore.getState().signOut()}
+            title="Log Out"
+            aria-label="Log Out"
+            style={{ color: 'var(--noir-red-bright)' }}
+          >
+            ⏻
+          </button>
 
           <SettingsMenu />
           <button

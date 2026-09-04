@@ -51,7 +51,10 @@ const api = {
   setIgnoreMouseEvents: (ignore: boolean) =>
     ipcRenderer.send('window:setIgnoreMouseEvents', ignore),
   moveDelta: (dx: number, dy: number) =>
-    ipcRenderer.send('window:moveDelta', dx, dy)
+    ipcRenderer.send('window:moveDelta', dx, dy),
+  onTrayAction: (callback: (action: string) => void) =>
+    ipcRenderer.on('tray-action', (_event, action) => callback(action)),
+  sendTrayAction: (action: string) => ipcRenderer.send('tray:action', action)
 }
 
 contextBridge.exposeInMainWorld('api', api)
